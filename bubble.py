@@ -1,6 +1,8 @@
 import pygame
 import random
 from bubble2 import Bubble
+import numpy as np
+
 
 STARTING_BLUE_BUBBLE = 10
 STARTING_RED_BUBBLE = 10
@@ -47,8 +49,30 @@ class Green_bubble(Bubble):
         Bubble.__init__(self, (0, 255, 0), x_boundary, y_boundary)
 
 
+def is_touching(b1, b2):
+    return np.linalg.norm(np.array([b1.x, b1.y])-np.array([b2.x, b2.y])) < (b1.size + b2.size)
+
+
+def handle_collisions(bubble_list):
+    blues, reds, greens = bubble_list
+    for blue_id, blue_bubble in blues.copy().items():
+        for other_bubbles in blues, reds, greens:
+            for other_bubble_id, other_bubble in other_bubbles.copy().items():
+                if blue_bubble == other_bubble:
+                    pass
+                else:
+                    if is_touching(blue_bubble, other_bubble):
+                        blue_bubble + other_bubble
+                        if other_bubble.size <= 0:
+                            del other_bubbles[other_bubble_id]
+                        if blue_bubble.size <= 0:
+                            del blues[blue_id]
+    return blues, reds, greens
+
+
 def draw_env(bubble_list):
     game_display.fill(WHITE)
+    blues, reds, greens = handle_collisions(bubble_list)
 
     for bubble_dict in bubble_list:
         for bubble_id in bubble_dict:
@@ -57,6 +81,7 @@ def draw_env(bubble_list):
             bubble.move()
             bubble.check_bounds()
     pygame.display.update()
+    return blues, reds, greens
 
 
 def main():
@@ -66,7 +91,7 @@ def main():
 
     print('current blue size: {}. curent red size: {}'.format(str(blue_bubbles[0].size),
                                                               str(red_bubbles[0].size)))
-    #blue_bubbles[0] + red_bubbles[0]
+
     print('Current blue size: {}. Current red size: {}'.format(str(blue_bubbles[0].size),
                                                                str(red_bubbles[0].size)))
 
@@ -76,7 +101,7 @@ def main():
                 pygame.quit()
                 quit()
 
-        draw_env([blue_bubbles, red_bubbles, green_bubbles])
+        blue_bubbles, red_bubbles, green_bubbules = draw_env([blue_bubbles, red_bubbles, green_bubbles])
         clock.tick(60)
 
 
