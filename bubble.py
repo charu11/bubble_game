@@ -2,6 +2,10 @@ import pygame
 import random
 from bubble2 import Bubble
 import numpy as np
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(filename='logfile.log', level=logging.INFO)
 
 
 STARTING_BLUE_BUBBLE = 10
@@ -24,11 +28,12 @@ class Blue_bubble(Bubble):
         Bubble.__init__(self, (0, 0, 255), x_boundary, y_boundary)
 
     def __add__(self, other_bubbles):
+        logging.info('Bubble add op: {} + {}'.format(str(self.color), str(other_bubbles.color)))
         if other_bubbles.color == (255, 0, 0):
             self.size -= other_bubbles.size
             other_bubbles.size = 0
 
-        elif other_bubbles.color == (0, 255 ,0):
+        elif other_bubbles.color == (0, 255, 0):
             self.size += other_bubbles.size
             other_bubbles.size = 0
 
@@ -58,6 +63,7 @@ def handle_collisions(bubble_list):
     for blue_id, blue_bubble in blues.copy().items():
         for other_bubbles in blues, reds, greens:
             for other_bubble_id, other_bubble in other_bubbles.copy().items():
+                logging.debug('checking if bubbles are touching {} + {}'.format(str(blue_bubble.color), str(other_bubble.color)))
                 if blue_bubble == other_bubble:
                     pass
                 else:
